@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.SeedMapper">
+    <!--定义sql映射-->
+    <resultMap id="seed" type="Seed">
+        <id column="Seed_id" property="seed_id"/>
+        <result column="Seed_name" property="seed_name"/>
+        <result column="Seed_price" property="seed_price"/>
+        <result column="Seed_type" property="seed_type"/>
+        <result column="Seed_season" property="seed_season"/>
+        <result column="Seed_maturation_time" property="seed_maturation_time"/>
+        <result column="Seed_image" property="seed_image"/>
+    </resultMap>
+
+    <!--查询数据库的信息-->
+    <select id="selectSeedAll" resultMap="seed">
+        select * from Seeds
+    </select>
+
+    <select id="selectSeed" resultMap="seed">
+        select * from Seeds
+    </select>
+
+    <select id="selectSeedByName" resultMap="seed">
+        select * from Seeds where Seed_name = #{seed_name}
+    </select>
+
+    <!--通过ID更新-->
+    <update id="updateSeedById">
+        update Seeds set Seed_name = #{seed_name},
+                        Seed_price = #{seed_price},
+                        Seed_type = #{seed_type},
+                        Seed_season = #{seed_season},
+                        Seed_maturation_time = #{seed_maturation_time},
+                        Seed_image= #{seed_image}
+                        where Seed_id = #{seed_id}
+    </update>
+
+    <!--通过名称删除-->
+    <delete id="deleteSeedByName">
+        delete from Seeds where Seed_name = #{seed_name}
+    </delete>
+
+    <!--插入-->
+    <insert id="insertSeed">
+        insert into Seeds(Seed_id,Seed_name,Seed_price,Seed_type,Seed_season,Seed_maturation_time,Seed_image)
+                        values(null,#{seed_name},
+                               #{seed_price},
+                               #{seed_type},
+                               #{seed_season},
+                               #{seed_maturation_time},
+                               #{seed_image})
+    </insert>
+
+    <!--模糊查询,种子名和种子生长季节，生长周期-->
+    <select id="selectSeedByNameAndSeasonAndCycle" resultMap="seed">
+        select * from Seeds
+        <where>
+            <if test="seed_name != null || seed_name != '' ">
+                seed_name like concat('%',#{seed_name},'%')
+            </if>
+            <if test="seed_season != null || seed_season != '' ">
+                and seed_season like concat('%',#{seed_season},'%')
+            </if>
+            <if test="seed_maturation_time != null || seed_maturation_time != '' ">
+                and seed_maturation_time like concat('%',#{seed_maturation_time},'%')
+            </if>
+        </where>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>
+
+
+

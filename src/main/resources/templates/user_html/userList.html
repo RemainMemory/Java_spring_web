@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <link rel="stylesheet" th:href="@{/css/xadmin.css}">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script th:src="@{/js/jquery-2.1.1.min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/vue.min.js}" type="text/javascript"></script>
+    <script th:src="@{/lib/layui/layui.js}" type="text/javascript"></script>
+    <script th:src="@{/js/xadmin.js}" type="text/javascript"></script>
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <style>
+        /*最外层透明*/
+        .el-table, .el-table__expanded-cell{
+            background-color: transparent;
+        }
+        /* 表格内背景颜色 */
+        .el-table th,
+        .el-table tr,
+        .el-table td {
+            background-color: transparent;
+        }
+    </style>
+</head>
+<!--
+第一步：引入vue.js文件；
+第二步：声明vue的作用域（在div标签里面声明）；
+第三步：创建vue对象（在script里面创建）；
+第四步：绑定vue作用域；
+第五步：声明数据对象，在data声明；
+第六步：方法声明
+第七步：文档加载事件
+-->
+<body>
+<!--2.声明vue的作用域-->
+<div id="app">
+    <br>
+    <center>
+        <!--模糊查找的搜索框,前面要有查询字样-->
+        <el-form :inline="true" :model="user" class="demo-form-inline">
+          <el-form-item label="姓名: ">
+            <el-input v-model="user.user_name" placeholder="请输入姓名"></el-input>
+          </el-form-item>
+          <el-form-item label="地址: ">
+            <el-input v-model="user.user_address" placeholder="请输入地址"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="onSubmit">查询</el-button>
+          </el-form-item>
+        </el-form>
+        <el-button @click="insertUser" type="primary" icon="el-icon-circle-plus-outline" circle size="middle">添加</el-button>
+    </center>
+    <br>
+    <template>
+        <el-table
+                header-align="center"
+                :data="tableData"
+                border>
+            <el-table-column
+                    label="序号"
+                    align="center"
+                    type="index"
+                    width="50">
+            </el-table-column>
+            <el-table-column
+                    prop="user_name"
+                    align="center"
+                    label="姓名"
+                    width="100">
+            </el-table-column>
+            <el-table-column
+                    prop="user_gender"
+                    align="center"
+                    label="性别"
+                    width="80">
+            </el-table-column>
+            </el-table-column>
+            <el-table-column
+                    prop="user_phonenumber"
+                    align="center"
+                    label="手机"
+                    width="120">
+            </el-table-column>
+            <el-table-column
+                    prop="user_address"
+                    align="center"
+                    label="地址"
+                    width="150">
+            </el-table-column>
+            <el-table-column
+                    prop="user_email"
+                    align="center"
+                    label="邮箱"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="user_password"
+                    align="center"
+                    label="密码"
+                    width="100">
+            </el-table-column>
+            <el-table-column
+                    align="center"
+                    label="操作">
+                <template slot-scope="scope">
+                    <el-button @click="insertUser" type="primary" icon="el-icon-circle-plus-outline" circle size="small"></el-button>
+                    <el-button @click="openUpdate(scope.row)" type="primary" icon="el-icon-edit" circle size="small"></el-button>
+                    &nbsp;
+                    <el-popconfirm
+                            confirm-button-text='删除'
+                            cancel-button-text='取消'
+                            confirm-button-type='danger'
+                            icon="el-icon-info"
+                            icon-color="red"
+                            @confirm="deleteUserSubmit(scope.row.user_name)"
+                            :title="title">
+                        <el-button  type="danger" icon="el-icon-delete" circle size="small"
+                                    slot="reference" @click="setTitle(scope.row.user_name)">
+                        </el-button>
+                    </el-popconfirm>
+
+                </template>
+            </el-table-column>
+        </el-table>
+    </template>
+</div>
+<!--3.创建vue对象-->
+<script>
+    new Vue({
+        /*4.绑定vue(el表达式绑定)*/
+        el:"#app",
+        /*5.声明数据对象*/
+        data:{
+            tableData: [],
+            title:'',
+            user:{
+                user_name:"",
+                user_address:"",
+            },
+        },
+        /*6.方法声明*/
+        methods:{
+            loadData(){
+                var _this= this;
+                $.ajax({
+                    url:"/selectUserAllResultVoController",
+                    dataType: "JSON",  /*请求的数据类型*/
+                    type: "POST",  /*请求方式*/
+                    /*data: JSON.stringify(this.user),  /!*将前端对象以JSON数据格式格式发送给后端（Java）*!/*/
+                    contentType: "application/json",
+                    success: function (rs) {     /*如果请求成功，则执行success这里面的方法，rs表示后端发送过来的数据*/
+                        console.log(rs)
+                        if (rs.status == 200) { //登录成功,进行跳转
+                            _this.tableData = rs.data;
+                           /* _this.$message(rs.message)*/
+                        }else {
+                            _this.$message(rs.message)
+                        }
+                    },error:function (){
+                        _this.$message("服务器错误！")
+                    }
+                })
+            },
+
+            onSubmit(){
+                var _this= this;
+                $.ajax({
+                    url:"/selectUserByNameAndAddress",
+                    dataType: "JSON",  /*请求的数据类型*/
+                    type: "POST",  /*请求方式*/
+                    data: JSON.stringify(this.user),  /*将前端对象以JSON数据格式格式发送给后端（Java）*/
+                    contentType: "application/json",
+                    success: function (rs) {     /*如果请求成功，则执行success这里面的方法，rs表示后端发送过来的数据*/
+                        console.log(rs)
+                        if (rs.status == 200) { //登录成功,进行跳转
+                            _this.tableData = rs.data;
+                           /* _this.$message(rs.message)*/
+                        }else {
+                            _this.$message(rs.message)
+                        }
+                    },error:function (){
+                        _this.$message("服务器错误！")
+                    }
+                })
+            },
+            /*编辑按钮*/
+            openUpdate(user){
+                console.log(user)
+                // user对象，转为json字符串,updateUserInfo相当于一个变量，这个里面有user数据，user数据是JSOn数据格式
+                localStorage.setItem("updateUserInfo", JSON.stringify(user))
+                // x_admin_show(打开窗口的名字，打开窗口的路径，宽度，高度)函数是layui里面提供的，用来打开一个页面窗口
+                x_admin_show("修改用户数据","/api/UserUpdate", 500,500)
+            },
+            deleteUserSubmit(user_name){
+                var _this= this;
+                $.ajax({
+                    url:"/deleteUserByNameController",
+                    dataType: "JSON",  /*请求的数据类型*/
+                    type: "POST",  /*请求方式*/
+                    //data:user_name,  /*json数据格式传参*/
+                    data:{
+                        user_name:user_name
+                    },
+                    //contentType: "application/json",
+                    success: function (rs) {     /*如果请求成功，则执行success这里面的方法，rs表示后端发送过来的数据*/
+                        console.log(rs)
+                        if (rs.status == 200) { //登录成功,进行跳转
+                            _this.$message(rs.message)
+                            location.reload();
+                        }else {
+                            _this.$message(rs.message)
+                        }
+                    },error:function (){
+                        _this.$message("服务器错误！")
+                    }
+                })
+            },
+            /*删除提示框*/
+            setTitle(user_name){
+               this.title =  '你是否确定删除【'+user_name+'】吗？'
+            },
+            insertUser(){
+                x_admin_show("添加用户数据","/api/UserInsert",600,500);
+            }
+
+        },
+        /*7.文档加载事件*/
+        mounted(){
+            this.loadData();
+        },
+    })
+</script>
+
+</body>
+</html>

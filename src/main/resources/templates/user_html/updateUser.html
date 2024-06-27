@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>修改</title>
+    <link rel="stylesheet" th:href="@{/css/xadmin.css}">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script th:src="@{/js/jquery-2.1.1.min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/vue.min.js}" type="text/javascript"></script>
+    <script th:src="@{/lib/layui/layui.js}" type="text/javascript"></script>
+    <script th:src="@{/js/xadmin.js}" type="text/javascript"></script>
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+</head>
+<body>
+<div id="app">
+    <br>
+    <el-form :model="userInfo" ref="userInfo" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="姓名：" prop="user_name">
+            <el-input v-model="userInfo.use_name" ></el-input>
+        </el-form-item>
+        <el-form-item label="手机：" prop="user_phonenumber">
+            <el-input v-model="userInfo.user_phonenumber"></el-input>
+        </el-form-item>
+        <el-form-item label="性别：" prop="user_gender">
+            <el-select v-model="userInfo.user_gender" placeholder="请选择性别">
+                <el-option label="女" value="女"></el-option>
+                <el-option label="男" value="男"></el-option>
+                <el-option label="未知" value="未知"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="地址：" prop="user_address">
+            <el-input v-model="userInfo.user_address"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱：" prop="user_email">
+            <el-input v-model="userInfo.user_email"></el-input>
+        </el-form-item>
+        <el-form-item label="密码：" prop="user_password">
+            <el-input v-model="userInfo.user_password"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="submitForm">立即修改</el-button>
+            <el-button @click="resetForm('userInfo')">立即重置</el-button>
+        </el-form-item>
+    </el-form>
+
+</div>
+<script>
+    new Vue({
+        el:"#app",
+        data:{
+            userInfo:{
+                user_id:"",
+                user_name:"",
+                user_phonenumber:"",
+                user_gender:"",
+                user_password:"",
+                user_address:"",
+                user_email:"",
+            }
+        },
+        methods:{
+            submitForm(){
+                var _this = this;   /*在vue中，this对象发送ajax之后就不再vue是vue对象了，想要使用vue对象，就需要将this赋值给另一个变量*/
+                console.log("---------------")
+                console.log(JSON.stringify(this.userInfo))
+                $.ajax({
+                    url:'/updateUserByIdController',  /*请求地址*/
+                    dataType: "JSON",  /*请求的数据类型*/
+                    type: "POST",  /*请求方式*/
+                    data: JSON.stringify(this.userInfo),  /*将前端对象以JSON数据格式格式发送给后端（Java）*/
+                    contentType: "application/json",
+                    success: function (rs) {     /*如果请求成功，则执行success这里面的方法，rs表示后端发送过来的数据*/
+                        if (rs.status == 200){
+                            layer.alert(rs.message,{icon:6},function () {
+                                // 关闭窗口
+                                var index = parent.layer.getFrameIndex(window.name);
+                                // 关闭窗口
+                                parent.layer.close(index);
+                                // 刷新
+                                parent.location.reload();
+                            })
+                        }else {
+                            layer.alert(rs.message,{icon:5},function () {
+                                // 关闭窗口
+                                var index = parent.layer.getFrameIndex(window.name);
+                                // 关闭窗口
+                                parent.layer.close(index);
+                                // 刷新
+                                parent.location.reload();
+                            })
+                        }
+                    },error:function (){
+                        _this.$message("服务器错误！")
+                    }
+                });
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            }
+        },
+        mounted(){
+            /*获取userList封装的JSON数据：localStorage.setItem("updateUserInfo", JSON.stringify(user))*/
+            this.userInfo = JSON.parse(localStorage.getItem("updateUserInfo"));
+        }
+    })
+</script>
+</body>
+</html>

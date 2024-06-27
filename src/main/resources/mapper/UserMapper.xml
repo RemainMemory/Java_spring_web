@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace：表示扫描哪个mapper层 -->
+<mapper namespace="com.example.demo.mapper.UserMapper">
+    <!-- 在这里可以定义你的SQL映射 -->
+    <!-- id：表示这个SQL映射的唯一标识 -->
+    <!-- resultType：表示查询结果的返回类型 -->
+    <!-- select * from user：表示查询的SQL语句 -->
+    <resultMap id="user" type="User">
+        <id column="user_id" property="User_id"/>
+        <result column="user_name" property="User_name"/>
+        <result column="user_password" property="User_password"/>
+        <result column="user_gender" property="User_gender"/>
+        <result column="user_address" property="User_address"/>
+        <result column="user_phone_number" property="User_phone_number"/>
+        <result column="user_email" property="User_email"/>
+    </resultMap>
+    <!--查询数据库的信息-->
+    <select id="selectUserAll" resultMap="user">
+        select * from user
+    </select>
+    <select id="selectUser" resultMap="user">
+        select * from user
+    </select>
+    <select id="selectUserByPhone" resultMap="user">
+        select * from user where user_phone_number = #{User_phone_number}
+    </select>
+
+    <!--登陆-->
+    <select id="UserLoginByPhoneAndPassword" resultMap="user">
+        select * from user where user_phone_number = #{User_phone_number}
+    </select>
+
+    <!--删除-->
+    <delete id="deleteUserByName">
+        delete from user where user_name = #{User_name}
+    </delete>
+
+    <!--修改-->
+    <update id="updateUserById">
+        update user set user_name = #{User_name},
+                        user_phone_number = #{User_phone_number},
+                        user_gender = #{User_gender},
+                        user_address = #{User_address},
+                        user_email = #{User_email},
+                        user_password = #{User_password}
+                        where user_id = #{User_id}
+    </update>
+
+    <!--插入-->
+    <insert id="insertUser">
+        insert into user(user_id,user_name,user_phone_number,user_gender,
+                         user_address,user_email, user_password)
+                        values(null,#{User_name},
+                               #{User_phone_number},
+                               #{User_gender},
+                               #{User_address},
+                               #{User_email},
+                               #{User_password})
+    </insert>
+
+    <!--模糊查询，姓名和地址-->
+    <select id="selectUserByNameAndAddress" resultMap="user">
+        select * from user
+        <where>
+            <if test="User_name != null || User_name != '' ">
+                user_name like concat('%',#{User_name},'%')
+            </if>
+            <if test="User_address != null || User_address != '' ">
+                and user_address like concat('%',#{User_address},'%')
+            </if>
+        </where>
+    </select>
+
+
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+	<title>信息管理系统</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<!-- 引入Vue.js库 -->
+	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<!-- 引入Element UI库 -->
+	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+	<!-- Custom Theme files -->
+	<link href="css/style.css" rel="stylesheet" type="text/css" media="all" />
+	<!-- //Custom Theme files -->
+</head>
+<body>
+<!-- main -->
+	<div id="loginApp" class="main-w3layouts wrapper">
+		<h1>Seed Management System</h1>
+		<div class="main-agileinfo">
+			<div class="agileits-top">
+				<form @submit.prevent="login">
+					<input class="text" type="text" v-model="user.user_phone_number" placeholder="Username" required="">
+					<input class="text" type="password" v-model="user.user_password" placeholder="Password" required="">
+					<div class="wthree-text">
+						<ul>
+							<li>
+								<label class="anim">
+									<input type="checkbox" class="checkbox">
+									<span> Remember me ?</span>
+								</label>
+							</li>
+							<li><a href="#">Forgot password?</a></li>
+						</ul>
+						<div class="clear"></div>
+					</div>
+					<input type="submit" value="LOGIN">
+				</form>
+				<p>Don't have an Account? <a href="#"> Signup Now!</a></p>
+			</div>
+		</div>
+		<!-- copyright -->
+		<div class="w3copyright-agile">
+			<p>© 2017 Magical Login Form. All rights reserved | Design by <a href="https://shop585798004.taobao.com/" target="_blank">前端ui</a></p>
+		</div>
+		<!-- //copyright -->
+		<ul class="w3lsg-bubbles">
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		</ul>
+	</div>
+	<!-- //main -->
+
+	<script>
+        new Vue({
+            el: "#loginApp",
+            data: {
+                user: {
+                    user_phone_number: "",
+                    user_password: ""
+                }
+            },
+            methods: {
+                login() {
+                    var _this = this;
+                    console.log(_this.user);
+                    $.ajax({
+                        url: '/UserLoginByPhoneAndPassword', /*请求地址*/
+                        dataType: "JSON", /*请求的数据类型*/
+                        type: "POST", /*请求方式*/
+                        data: {
+                            user_phone_number: _this.user.user_phone_number,
+                            user_password: _this.user.user_password
+                        },
+                        success: function (rs) { /*如果请求成功, 则执行success里面的方法, rs表示后端发送过来的数据*/
+                            console.log(rs); /*在控制台打印信息(rs): rs表示前端接收到的后端数据*/
+                            if (rs.status == 200) { //登录成功, 进行跳转
+                                _this.$message({
+                                    message: rs.message,
+                                    type: 'success'
+                                });
+                                setTimeout(function () {
+                                    location.href = '/api/UserIndex' //跳转, 1秒后跳转
+                                }, 1000);
+                            } else {
+                                _this.$message({
+                                    message: rs.message,
+                                    type: 'error'
+                                });
+                            }
+                        },
+                        error: function () {
+                            _this.$message({
+                                message: "服务器错误！",
+                                type: 'error'
+                            });
+                        }
+                    });
+                }
+            },
+            mounted() {
+                console.log('Vue instance mounted');
+            }
+        });
+    </script>
+</body>
+</html>
