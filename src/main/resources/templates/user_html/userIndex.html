@@ -21,6 +21,77 @@
     <script th:src="@{/js/xadmin.js}" type="text/javascript"></script>
     <!-- 引入组件库 -->
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: url('../images/img.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid #e0e0e0;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo a {
+            color: #000; /* Changed color to black */
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .left-nav {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #34495e;
+            height: 100vh;
+        }
+        .left-nav a {
+            color: #000; /* Changed color to black */
+        }
+        .left-nav a:hover {
+            background-color: #bdc3c7;
+        }
+        .layui-nav-item a {
+            color: #000; /* Changed color to black */
+        }
+        .layui-nav-item a:hover {
+            background-color: #ecf0f1;
+        }
+        .layui-tab-title li {
+            background-color: #4A90E2;
+            color: #fff;
+        }
+        .layui-tab-title li.layui-this {
+            background-color: #357ABD;
+        }
+        .layui-tab-title .layui-this:after {
+            border-top-color: #357ABD;
+        }
+        .layui-tab-content {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        .footer {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #34495e;
+            text-align: center;
+            padding: 10px 0;
+        }
+        .footer a {
+            color: #34495e;
+        }
+        .footer a:hover {
+            color: #2c3e50;
+        }
+        /* New styles to change the color of the top nav text */
+        .container .logo a,
+        .container .left_open i,
+        .container .layui-nav a,
+        .container .layui-nav .layui-nav-item a,
+        .container .layui-nav .layui-nav-item .layui-nav-child dd a {
+            color: #000 !important;
+        }
+    </style>
 </head>
 <body>
 <!-- 顶部开始 -->
@@ -29,14 +100,14 @@
     <div class="left_open">
         <i title="展开左侧栏" class="iconfont">&#xe699;</i>
     </div>
-    <div>
-        <img style="margin-left: 1020px;width: 40px;height: 40px;border-radius:50%; overflow:hidden;" :src="src" @click="chooseImage">
+    <div style="display: flex; align-items: center;">
+        <img style="width: 40px;height: 40px;border-radius:50%; overflow:hidden;" :src="src" @click="chooseImage">
         <input id="file" type="file" name="file" @change="changeImage()" style="display: none">
-        <ul class="layui-nav right" lay-filter="">
+        <ul class="layui-nav right" lay-filter="" style="margin-left: 20px;">
             <li class="layui-nav-item">
-                <a href="javascript:;">欢迎您：{{loginUsername}}</a>
+                <a href="javascript:;">欢迎您：{{user_name}}</a>
                 <dl class="layui-nav-child"> <!-- 二级菜单 -->
-                    <dd><a href="http://localhost:8080/logout">退出</a></dd>
+                    <dd><a href="javascript:;" @click="logout">退出</a></dd>
                 </dl>
             </li>
             <li class="layui-nav-item to-index"><a href="javascript:void(0);">前台首页</a></li>
@@ -92,7 +163,7 @@
         <ul class="layui-tab-title">
             <li>我的桌面</li>
         </ul>
-        <div class="layui-tab-content" th:style="'background:url(' + '../images/dream.jpg' + ')' + 'no-repeat;' + 'background-size:cover;'">
+        <div class="layui-tab-content">
             <div class="layui-tab-item layui-show" >
                 <iframe src="" frameborder="0" scrolling="yes" name="right" class="x-iframe"></iframe>
             </div>
@@ -110,19 +181,34 @@
     new Vue({
         el:'#app',
         data:{
-            loginUsername:"紫霞仙子",
+            user_name:"",
             src:"https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
         },
         methods:{
             changeImage(){
-
+                const fileInput = document.getElementById('file');
+                if (fileInput.files && fileInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.src = e.target.result;
+                    };
+                    reader.readAsDataURL(fileInput.files[0]);
+                }
             },
             chooseImage(){
-                $("#file").click();
+                document.getElementById('file').click();
+            },
+            logout() {
+                localStorage.removeItem("user_name");
+                // 其他退出逻辑
+                window.location.href = "http://localhost:8080"; // 假设你的登录页面路径是 /login
             }
         },
         mounted(){
-            this.loginUsername = localStorage.getItem("loginUsername")
+            // 获取用户信息
+            this.user_name = localStorage.getItem("updateUserInfo");
+
+
         }
     })
 </script>

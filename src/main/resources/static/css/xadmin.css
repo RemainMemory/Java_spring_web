@@ -221,7 +221,7 @@ xblock{
 }
 .container .left_open{
 	height: 45px;
-	float: left;
+	float: right;
 }
 .container .left_open i{
 	display: block;

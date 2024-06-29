@@ -23,5 +23,4 @@ public interface SeedService {
     //模糊查询,种子名和种子生长季节，生长周期
     ResultVo selectSeedByNameAndSeasonAndCycle(Seed seed);
 
-
 }
